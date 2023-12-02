@@ -1,70 +1,65 @@
 fn main() {
-    let input = include_str!("./input1.txt");
+    // let input = include_str!("./input1.txt");
+    //     let input = r#"3hlgrdsdsplnhpc
+    // 1vbdxqnzrthree
+    // seven93six25sixnine
+    // four1bxstchgzjdpxdninedpfour4
+    // 65fivetnsseight8lcvgkkglslcjtjssxmgtvk
+    // fourjqgvkdkl2pxseven2ninemzqfqv
+    // zqmsbltpvsrzcpnn2twolzdjqmb88
+    // 3qnzkmbltldthreesix1ffive36
+    // kspfzvvvfkztcs9threefoureightsixseveneight"#;
+    let input = r#"eightwothree"#;
 
     let sum = process(input);
     println!("answer {}", sum);
 }
 
-fn process(input: &str) -> i32 {
-    let valid_num_str = [
-        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    ];
-    let mut input_arr = input
-        .lines()
-        .map(|line| line.to_string())
-        .collect::<Vec<_>>();
+fn process(input: &str) -> u32 {
+    input.lines().map(process_line).sum::<u32>()
+}
 
-    let to_num = |value| match value {
-        "one" => "1",
-        "two" => "2",
-        "three" => "3",
-        "four" => "4",
-        "five" => "5",
-        "six" => "6",
-        "seven" => "7",
-        "eight" => "8",
-        "nine" => "9",
-        _ => unreachable!(),
-    };
+fn process_line(line: &str) -> u32 {
+    println!("line {:?}", line);
+    let mut it = (0..line.len()).filter_map(|index| {
+        let reduced_line = &line[index..];
 
-    for input in input_arr.iter_mut() {
-        let mut order_of_occurence = vec![];
-        for num_str in valid_num_str {
-            if input.contains(num_str) {
-                let pos = input
-                    .match_indices(num_str)
-                    .map(|(pos, _)| pos)
-                    .collect::<Vec<_>>();
-                for index in pos {
-                    order_of_occurence.push((num_str, index));
-                }
-            }
-        }
+        println!("reduced_line {:?}", reduced_line);
+        let result = if reduced_line.starts_with("one") {
+            '1'
+        } else if reduced_line.starts_with("two") {
+            '2'
+        } else if reduced_line.starts_with("three") {
+            '3'
+        } else if reduced_line.starts_with("four") {
+            '4'
+        } else if reduced_line.starts_with("five") {
+            '5'
+        } else if reduced_line.starts_with("six") {
+            '6'
+        } else if reduced_line.starts_with("seven") {
+            '7'
+        } else if reduced_line.starts_with("eight") {
+            '8'
+        } else if reduced_line.starts_with("nine") {
+            '9'
+        } else {
+            reduced_line.chars().next().unwrap()
+        };
 
-        order_of_occurence.sort_by(|a, b| a.1.cmp(&b.1));
+        println!("result --> {:?}", result);
 
-        for (i, (a, _b)) in order_of_occurence.iter().enumerate() {
-            if i == 0 || i == order_of_occurence.len() - 1 {
-                *input = input.replace(a, to_num(a)).to_owned();
-            }
-        }
+        result.to_digit(10)
+    });
+
+    let first = it.next().expect("should be a number");
+
+    match it.last() {
+        Some(num) => format!("{first}{num}"),
+        None => format!("{first}{first}"),
     }
-
-    let input_arr: Vec<Vec<char>> = input_arr
-        .iter()
-        .map(|x| x.chars().filter(|x| x.is_numeric()).collect::<Vec<_>>())
-        .collect::<Vec<_>>();
-
-    let mut b = vec![];
-
-    for v in input_arr {
-        let c: i32 = format!("{}{}", v.first().unwrap(), v.last().unwrap())
-            .parse()
-            .ok()
-            .unwrap();
-        b.push(c);
-    }
-    b.iter().sum::<i32>()
+    .parse::<u32>()
+    .expect("should be a valid number")
 }
 
 #[cfg(test)]
