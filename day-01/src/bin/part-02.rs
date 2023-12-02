@@ -1,16 +1,5 @@
 fn main() {
-    // let input = include_str!("./input1.txt");
-    //     let input = r#"3hlgrdsdsplnhpc
-    // 1vbdxqnzrthree
-    // seven93six25sixnine
-    // four1bxstchgzjdpxdninedpfour4
-    // 65fivetnsseight8lcvgkkglslcjtjssxmgtvk
-    // fourjqgvkdkl2pxseven2ninemzqfqv
-    // zqmsbltpvsrzcpnn2twolzdjqmb88
-    // 3qnzkmbltldthreesix1ffive36
-    // kspfzvvvfkztcs9threefoureightsixseveneight"#;
-    let input = r#"eightwothree"#;
-
+    let input = include_str!("./input1.txt");
     let sum = process(input);
     println!("answer {}", sum);
 }
