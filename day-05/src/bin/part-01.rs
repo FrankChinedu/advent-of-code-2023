@@ -52,8 +52,8 @@ fn read_file(name: &str) -> io::Result<Vec<String>> {
 
     let mut string_arr = vec![];
 
-    let length = if name == "text.txt" {
-        include_str!("./text.txt").lines().collect::<Vec<_>>().len() - 1
+    let length = if name == "test.txt" {
+        include_str!("./test.txt").lines().collect::<Vec<_>>().len() - 1
     } else {
         include_str!("./input.txt")
             .lines()
@@ -390,7 +390,7 @@ mod test {
     use super::*;
     #[test]
     fn test_1() {
-        let input = read_file("text.txt").expect("unable to read file");
+        let input = read_file("test.txt").expect("unable to read file");
         assert_eq!(35, process(input))
     }
 }

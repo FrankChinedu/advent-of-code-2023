@@ -1,10 +1,36 @@
+// use indicatif::ProgressBar;
+// use indicatif::ProgressIterator;
+use rayon::prelude::*;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
 fn main() {
-    let lines = read_file("input.txt").expect("unable to read file");
+    let lines = read_file("test.txt").expect("unable to read file");
     let num = process(lines);
     println!("num -- {:?}", num);
+}
+
+fn get_array_chunks(seeds: &[&str]) -> Vec<usize> {
+    println!("get_array_chunks");
+    seeds
+        .chunks(2)
+        .par_bridge()
+        .flat_map(|x| {
+            let start = x
+                .first()
+                .expect("has first")
+                .parse::<usize>()
+                .expect("can parse");
+            let end = x
+                .last()
+                .expect("has last")
+                .parse::<usize>()
+                .expect("can parse last")
+                + start;
+            (start..end).into_par_iter().collect::<Vec<_>>()
+        })
+        .into_par_iter()
+        .collect::<Vec<_>>()
 }
 
 fn process(input: Vec<String>) -> usize {
@@ -13,6 +39,9 @@ fn process(input: Vec<String>) -> usize {
     let seeds = seeds.split(':').collect::<Vec<_>>();
     let seeds = *seeds.last().expect("msg");
     let seeds = seeds.trim().split([' ', '\n']).collect::<Vec<_>>();
+    let seeds = get_array_chunks(&seeds);
+
+    println!("seedds");
 
     let seed_to_soil_map = &maps[0];
     let soil_to_fertilizer = &maps[1];
@@ -22,26 +51,9 @@ fn process(input: Vec<String>) -> usize {
     let temperature_to_humidity = &maps[5];
     let humidity_to_location = &maps[6];
 
-    let locations = seeds
-        .iter()
-        .map(|id| {
-            Seed::new(id.parse::<usize>().expect("not fail"))
-                .transform_seed()
-                .to_soil(seed_to_soil_map)
-                .to_fertilizer(soil_to_fertilizer)
-                .to_water(fertilizer_to_water)
-                .to_light(water_to_light)
-                .to_temperature(light_to_temperature)
-                .to_humidity(temperature_to_humidity)
-                .to_location(humidity_to_location)
-        })
-        .min()
-        .expect("will not");
-    locations
-
     // for (index, id) in seeds.iter().enumerate() {
     //     if index == 0 {
-    //         let num = Seed::new(id.parse::<usize>().expect("not fail"))
+    //         let num = Seed::new(*id)
     //             .transform_seed()
     //             .to_soil(seed_to_soil_map)
     //             .to_fertilizer(soil_to_fertilizer)
@@ -55,7 +67,32 @@ fn process(input: Vec<String>) -> usize {
     //         // println!("seed {:?}", item);
     //     }
     // }
+
+    // let locations =
+    // let bar = ProgressBar::new(1000);
+
+    // bar.finish();
+
+    seeds
+        .into_par_iter()
+        .map(|id| {
+            // bar.inc(1);
+            Seed::new(id)
+                .transform_seed()
+                .to_soil(seed_to_soil_map)
+                .to_fertilizer(soil_to_fertilizer)
+                .to_water(fertilizer_to_water)
+                .to_light(water_to_light)
+                .to_temperature(light_to_temperature)
+                .to_humidity(temperature_to_humidity)
+                .to_location(humidity_to_location)
+        })
+        // .into_par_iter()
+        .min()
+        .expect("will not")
     // 0
+
+    // locations
 }
 
 fn read_file(name: &str) -> io::Result<Vec<String>> {
@@ -70,8 +107,8 @@ fn read_file(name: &str) -> io::Result<Vec<String>> {
 
     let mut string_arr = vec![];
 
-    let length = if name == "text.txt" {
-        include_str!("./text.txt").lines().collect::<Vec<_>>().len() - 1
+    let length = if name == "test.txt" {
+        include_str!("./test.txt").lines().collect::<Vec<_>>().len() - 1
     } else {
         include_str!("./input.txt")
             .lines()
@@ -129,6 +166,8 @@ fn create_vec_number_settings(input: &str) -> Option<Vec<NumBerSettings>> {
 
     let mut number_settings = vec![];
 
+    // println!("input ={input:?}");
+
     for item in input {
         let numbers = item
             .split(' ')
@@ -149,15 +188,16 @@ fn create_vec_number_settings(input: &str) -> Option<Vec<NumBerSettings>> {
 
 fn transform(number_settings: Vec<NumBerSettings>, num: usize) -> usize {
     let range_map = number_settings
-        .iter()
+        .into_par_iter()
         .filter(|x| {
             let range = x.source..=x.source_end;
+            // range.into_par_iter().any(|x| x == num)
             range.contains(&num)
         })
         .collect::<Vec<_>>();
 
     if !range_map.is_empty() {
-        let number_setting = range_map[0];
+        let number_setting = &range_map[0];
         let num = number_setting.source_end - num;
         number_setting.destination_end - num
     } else {
@@ -203,6 +243,7 @@ struct SeedToSoil {
 
 impl SeedToSoil {
     fn to_soil(&self, input: &str) -> SoilToFertilizer {
+        println!("input {input}");
         let soil = Self::new(input, self.seed).tranform();
         SoilToFertilizer::new("", soil)
     }
@@ -408,7 +449,7 @@ mod test {
     use super::*;
     #[test]
     fn test_1() {
-        let input = read_file("text.txt").expect("unable to read file");
-        assert_eq!(35, process(input))
+        let input = read_file("test.txt").expect("unable to read file");
+        assert_eq!(46, process(input))
     }
 }
