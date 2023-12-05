@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
 fn main() {
-    let lines = read_file("text.txt").expect("unable to read file");
+    let lines = read_file("input.txt").expect("unable to read file");
     let num = process(lines);
     println!("num -- {:?}", num);
 }
@@ -36,12 +36,11 @@ fn process(input: Vec<String>) -> usize {
                 .to_location(humidity_to_location)
         })
         .min()
-        .expect("will not ");
-
-    println!("locations, {:?}", locations);
+        .expect("will not");
+    locations
 
     // for (index, id) in seeds.iter().enumerate() {
-    //     if index == 1 {
+    //     if index == 0 {
     //         let num = Seed::new(id.parse::<usize>().expect("not fail"))
     //             .transform_seed()
     //             .to_soil(seed_to_soil_map)
@@ -56,7 +55,7 @@ fn process(input: Vec<String>) -> usize {
     //         // println!("seed {:?}", item);
     //     }
     // }
-    0
+    // 0
 }
 
 fn read_file(name: &str) -> io::Result<Vec<String>> {
@@ -71,11 +70,15 @@ fn read_file(name: &str) -> io::Result<Vec<String>> {
 
     let mut string_arr = vec![];
 
-    let length = include_str!("./input.txt")
-        .lines()
-        .collect::<Vec<_>>()
-        .len()
-        - 1;
+    let length = if name == "text.txt" {
+        include_str!("./text.txt").lines().collect::<Vec<_>>().len() - 1
+    } else {
+        include_str!("./input.txt")
+            .lines()
+            .collect::<Vec<_>>()
+            .len()
+            - 1
+    };
 
     for (index, line) in lines.enumerate() {
         let line = line?;
@@ -148,8 +151,8 @@ fn transform(number_settings: Vec<NumBerSettings>, num: usize) -> usize {
     let range_map = number_settings
         .iter()
         .filter(|x| {
-            let mut range = x.source..=x.source_end;
-            range.any(|v| v == num)
+            let range = x.source..=x.source_end;
+            range.contains(&num)
         })
         .collect::<Vec<_>>();
 
