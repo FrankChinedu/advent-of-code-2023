@@ -38,6 +38,24 @@ fn process(input: Vec<String>) -> usize {
         .min()
         .expect("will not");
     locations
+
+    // for (index, id) in seeds.iter().enumerate() {
+    //     if index == 0 {
+    //         let num = Seed::new(id.parse::<usize>().expect("not fail"))
+    //             .transform_seed()
+    //             .to_soil(seed_to_soil_map)
+    //             .to_fertilizer(soil_to_fertilizer)
+    //             .to_water(fertilizer_to_water)
+    //             .to_light(water_to_light)
+    //             .to_temperature(light_to_temperature)
+    //             .to_humidity(temperature_to_humidity)
+    //             .to_location(humidity_to_location);
+
+    //         println!("seed ={num}");
+    //         // println!("seed {:?}", item);
+    //     }
+    // }
+    // 0
 }
 
 fn read_file(name: &str) -> io::Result<Vec<String>> {
