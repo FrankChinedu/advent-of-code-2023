@@ -1,11 +1,11 @@
-// use indicatif::ProgressBar;
+use indicatif::ProgressBar;
 // use indicatif::ProgressIterator;
 use rayon::prelude::*;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
 fn main() {
-    let lines = read_file("test.txt").expect("unable to read file");
+    let lines = read_file("input.txt").expect("unable to read file");
     let num = process(lines);
     println!("num -- {:?}", num);
 }
@@ -53,7 +53,7 @@ fn process(input: Vec<String>) -> usize {
 
     // for (index, id) in seeds.iter().enumerate() {
     //     if index == 0 {
-    //         let num = Seed::new(*id)
+    //         let _num = Seed::new(*id)
     //             .transform_seed()
     //             .to_soil(seed_to_soil_map)
     //             .to_fertilizer(soil_to_fertilizer)
@@ -63,20 +63,17 @@ fn process(input: Vec<String>) -> usize {
     //             .to_humidity(temperature_to_humidity)
     //             .to_location(humidity_to_location);
 
-    //         println!("seed ={num}");
+    //         // println!("seed-- ={num}");
     //         // println!("seed {:?}", item);
     //     }
     // }
 
-    // let locations =
-    // let bar = ProgressBar::new(1000);
+    let bar = ProgressBar::new(1000);
 
-    // bar.finish();
-
-    seeds
+    let locations = seeds
         .into_par_iter()
         .map(|id| {
-            // bar.inc(1);
+            bar.inc(1);
             Seed::new(id)
                 .transform_seed()
                 .to_soil(seed_to_soil_map)
@@ -89,10 +86,12 @@ fn process(input: Vec<String>) -> usize {
         })
         // .into_par_iter()
         .min()
-        .expect("will not")
+        .expect("will not");
+    bar.finish();
+
     // 0
 
-    // locations
+    locations
 }
 
 fn read_file(name: &str) -> io::Result<Vec<String>> {
@@ -243,7 +242,7 @@ struct SeedToSoil {
 
 impl SeedToSoil {
     fn to_soil(&self, input: &str) -> SoilToFertilizer {
-        println!("input {input}");
+        // println!("input {input}");
         let soil = Self::new(input, self.seed).tranform();
         SoilToFertilizer::new("", soil)
     }
