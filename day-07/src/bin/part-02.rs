@@ -2,26 +2,25 @@ use std::{cmp::Ordering, collections::HashMap};
 
 fn main() {
     // let input = parse_input(false);
-    let input = parse_input(false);
+    let input = parse_input(true);
     let num = process(input);
     println!("num={num}");
 }
 
-const LABELS: [(char, i32); 14] = [
+const LABELS: [(char, i32); 13] = [
     ('A', 14),
     ('K', 13),
     ('Q', 12),
-    ('J', 11),
-    ('T', 10),
-    ('9', 9),
-    ('8', 8),
-    ('7', 7),
-    ('6', 6),
-    ('5', 5),
-    ('4', 4),
-    ('3', 3),
-    ('2', 2),
-    ('J', 1),
+    ('T', 11),
+    ('9', 10),
+    ('8', 9),
+    ('7', 8),
+    ('6', 7),
+    ('5', 6),
+    ('4', 5),
+    ('3', 4),
+    ('2', 3),
+    ('J', 2),
 ];
 
 fn get_lables() -> HashMap<char, usize> {
@@ -44,6 +43,11 @@ fn process(input: Vec<&str>) -> usize {
             Hand::new(cards, bid, hand_str)
         })
         .collect::<Vec<_>>();
+
+    for hand in &hands {
+        println!("hand ={:?}", hand);
+        println!(" ");
+    }
 
     hands.sort_by_key(|a| (a.hand_type, a.card_strength_tuple));
 
@@ -195,7 +199,7 @@ mod test {
     #[test]
     fn test_1() {
         let input = parse_input(true);
-        assert_eq!(6440, process(input))
+        assert_eq!(5905, process(input))
     }
 
     fn get_hand(hand_str: &str) -> Hand {
