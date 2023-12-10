@@ -27,10 +27,7 @@ fn process(input: &str) -> usize {
         .lines()
         .map(|x| {
             x.chars()
-                .map(|c| {
-                    println!("c => {c}");
-                    Pipe::new(c, pipes.clone())
-                })
+                .map(|c| Pipe::new(c, pipes.clone()))
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
@@ -71,7 +68,9 @@ fn process(input: &str) -> usize {
         y: usize,
         mut count: usize,
         from: &Direction,
-    ) -> usize {
+        mut going_up: usize,
+        mut going_down: usize,
+    ) -> (usize, usize, usize) {
         let oppisite_of_from = from.get_opposite();
         let new_direction = pipe
             .directions
@@ -79,7 +78,16 @@ fn process(input: &str) -> usize {
             .filter(|x| **x != oppisite_of_from)
             .collect::<Vec<_>>();
         let new_direction = *new_direction[0];
-        print!(" {} => ", pipe.symbol);
+
+        if new_direction.is_up() {
+            going_up += 1;
+        }
+        if new_direction.is_down() {
+            going_down += 1;
+        }
+
+        // if new_direction.get() == Direction::Up { x: (), y: () }
+
         // println!("x=>{x} y=>{y}");
         // println!(
         //     "Pipe.symbol = {:?} new_direction ={:?}",
@@ -89,19 +97,28 @@ fn process(input: &str) -> usize {
         count += 1;
 
         if pipe.symbol == 'S' {
-            count
+            (count, going_up, going_down)
         } else {
             let new_pos = new_direction.get();
             let new_pipe = get_pipe(map, &new_pos, x, y);
             let new_x = (new_pos.x + x as isize) as usize;
             let new_y = (new_pos.y + y as isize) as usize;
-            println!("new_x=>{new_x} new_y=>{new_y}");
-            println!(
-                "new_pipe.symbol = {:?} new_direction ={:?}",
-                new_pipe, new_direction
-            );
-            println!("==============================================");
-            find_destination(map, &new_pipe, new_x, new_y, count, &new_direction)
+            // println!("new_x=>{new_x} new_y=>{new_y}");
+            // println!(
+            //     "new_pipe.symbol = {:?} new_direction ={:?}",
+            //     new_pipe, new_direction
+            // );
+            // println!("==============================================");
+            find_destination(
+                map,
+                &new_pipe,
+                new_x,
+                new_y,
+                count,
+                &new_direction,
+                going_up,
+                going_down,
+            )
         }
     }
 
@@ -112,33 +129,25 @@ fn process(input: &str) -> usize {
         if is_valid && get_pipe(&map, &direction.get(), x, y).symbol != '.' {
             let pipe = get_pipe(&map, &direction.get(), x, y);
             let position = direction.get();
-            println!("x=>{x} y=>{x} ===>");
-            println!(
-                "Pipe.symbol = {:?} direction ={:?} position {position:?}",
-                pipe, direction
-            );
             let new_x = (x as isize + position.x) as usize;
             let new_y = (y as isize + position.y) as usize;
-            println!("new_x=>{new_x} new_x=>{y} ===>");
 
             let step_count = 0;
-            println!(" ");
-            let val = find_destination(&map, &pipe, new_x, new_y, step_count, direction);
-            // println!(" val ={val}");
+            let going_up = 0_usize;
+            let going_down = 0_usize;
+            // println!(" ");
+            let val = find_destination(
+                &map, &pipe, new_x, new_y, step_count, direction, going_up, going_down,
+            );
             from.push((direction, val));
             println!("from: {:?}", from);
-
-            // 's_loop: loop {
-
-            // }
-            // break val;
         } else {
             continue;
         }
     }
     // }
 
-    println!("position_of_s:{position_of_s:?}");
+    // println!("position_of_s:{position_of_s:?}");
     0
 }
 
@@ -202,6 +211,12 @@ impl From<Pos> for Direction {
 }
 
 impl Direction {
+    fn is_up(self) -> bool {
+        matches!(self, Direction::Up { .. })
+    }
+    fn is_down(self) -> bool {
+        matches!(self, Direction::Down { .. })
+    }
     fn get(self) -> Pos {
         match self {
             Direction::Up { x, y } => Pos {
