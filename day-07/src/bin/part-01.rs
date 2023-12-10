@@ -55,7 +55,7 @@ fn process(input: Vec<&str>) -> usize {
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, PartialEq, Eq)]
 struct Hand<'a> {
     cards: Vec<Card>,
     bid: usize,
@@ -64,6 +64,18 @@ struct Hand<'a> {
     hand_type: Type,
     card_strength: usize,
     card_strength_tuple: (usize, usize, usize, usize, usize),
+}
+
+impl<'a> Ord for Hand<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.cards.cmp(&other.cards)
+    }
+}
+
+impl<'a> PartialOrd for Hand<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl<'a> Hand<'a> {

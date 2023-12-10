@@ -30,11 +30,11 @@ enum HandType {
     HighCard = 0,
 }
 
-#[derive(Debug)]
-struct Hand {
-    hand: HandType,
-    first_card: char,
-}
+// #[derive(Debug)]
+// struct Hand {
+//     hand: HandType,
+//     first_card: char,
+// }
 fn score_hand(hand: &str) -> (HandType, (u32, u32, u32, u32, u32)) {
     use HandType::*;
 
@@ -89,7 +89,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
     let hands = input
         .lines()
         .map(|line| {
-            let (hand, bid) = line.split_once(" ").unwrap();
+            let (hand, bid) = line.split_once(' ').unwrap();
             (hand, bid.parse::<u32>().unwrap(), score_hand(hand))
         })
         .sorted_by_key(|x| (x.2 .0 as u8, x.2 .1))
