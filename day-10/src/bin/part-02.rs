@@ -20,14 +20,17 @@ fn process(input: &str) -> usize {
         ('7', vec![DOWN, LEFT]),
         ('F', vec![DOWN, RIGHT]),
         ('.', vec![]),
-        ('S', vec![LEFT, UP, RIGHT, DOWN]),
+        ('S', vec![DOWN, LEFT, UP, RIGHT]),
     ];
 
     let map = input
         .lines()
         .map(|x| {
             x.chars()
-                .map(|c| Pipe::new(c, pipes.clone()))
+                .map(|c| {
+                    println!("c => {c}");
+                    Pipe::new(c, pipes.clone())
+                })
                 .collect::<Vec<_>>()
         })
         .collect::<Vec<_>>();
@@ -92,12 +95,12 @@ fn process(input: &str) -> usize {
             let new_pipe = get_pipe(map, &new_pos, x, y);
             let new_x = (new_pos.x + x as isize) as usize;
             let new_y = (new_pos.y + y as isize) as usize;
-            // println!("new_x=>{new_x} new_y=>{new_y}");
-            // println!(
-            //     "new_pipe.symbol = {:?} new_direction ={:?}",
-            //     new_pipe, new_direction
-            // );
-            // println!("==============================================");
+            println!("new_x=>{new_x} new_y=>{new_y}");
+            println!(
+                "new_pipe.symbol = {:?} new_direction ={:?}",
+                new_pipe, new_direction
+            );
+            println!("==============================================");
             find_destination(map, &new_pipe, new_x, new_y, count, &new_direction)
         }
     }
