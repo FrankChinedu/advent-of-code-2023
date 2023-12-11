@@ -1,80 +1,14 @@
 use std::collections::HashMap;
 
 fn main() {
-    let c = -1 + 2;
-    println!("c {c}");
-    let input = include_str!("./test.txt");
+    let input = include_str!("./input.txt");
     let num = process(input);
     println!(" ");
     println!("num => {num}")
 }
 
-use std::collections::VecDeque;
-
-#[allow(dead_code)]
-// Function to find the shortest distance between two elements in a matrix
-fn shortest_distance(
-    matrix: &[Vec<i32>],
-    start: (usize, usize),
-    end: (usize, usize),
-) -> Option<usize> {
-    let rows = matrix.len();
-    let cols = matrix[0].len();
-
-    // Check if start and end positions are within the matrix
-    if start.0 >= rows || start.1 >= cols || end.0 >= rows || end.1 >= cols {
-        return None;
-    }
-
-    // Directions for moving to neighboring cells (up, down, left, right)
-    let directions = [(-1, 0), (1, 0), (0, -1), (0, 1)];
-
-    // Create a queue for BFS
-    let mut queue = VecDeque::new();
-    queue.push_back((start, 0)); // Start position and distance
-
-    // Visited array to track visited cells
-    let mut visited = vec![vec![false; cols]; rows];
-    visited[start.0][start.1] = true;
-
-    while let Some(((r, c), distance)) = queue.pop_front() {
-        if (r, c) == end {
-            return Some(distance);
-        }
-
-        for (dr, dc) in &directions {
-            let new_r = (r as i32 + dr) as usize;
-            let new_c = (c as i32 + dc) as usize;
-
-            // Check if the new position is within the matrix and hasn't been visited
-            if new_r < rows && new_c < cols && !visited[new_r][new_c] {
-                queue.push_back(((new_r, new_c), distance + 1));
-                visited[new_r][new_c] = true;
-            }
-        }
-    }
-
-    // If no path is found
-    None
-}
-
-#[allow(dead_code)]
-fn factorial(n: isize) -> isize {
-    if n == 0 || n == 1 {
-        1
-    } else {
-        (2..=n).product()
-    }
-}
-
-#[allow(dead_code)]
-fn combinations(n: isize, k: isize) -> isize {
-    factorial(n) / (factorial(k) * factorial(n - k))
-}
-
 fn generate_pairs(n: isize) -> Vec<(isize, isize)> {
     let mut pairs = Vec::new();
-
     for i in 1..=n {
         let min = n;
         let ma = i + 1;
@@ -82,9 +16,6 @@ fn generate_pairs(n: isize) -> Vec<(isize, isize)> {
             pairs.push((i, j));
         }
     }
-
-    println!("len {}", pairs.len());
-
     pairs
 }
 
@@ -134,11 +65,6 @@ fn process(input: &str) -> usize {
         }
     }
 
-    println!("columns {columns:?}");
-    println!("rows {rows:?}");
-
-    println!(" ");
-    // let mut lines = lines;
     let len = lines.len();
 
     for line in lines.iter_mut() {
