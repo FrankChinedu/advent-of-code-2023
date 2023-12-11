@@ -7,6 +7,7 @@ fn main() {
     println!("num => {num}")
 }
 
+#[allow(dead_code)]
 fn generate_pairs(n: isize) -> Vec<(isize, isize)> {
     let mut pairs = Vec::new();
     for i in 1..=n {
@@ -65,32 +66,34 @@ fn process(input: &str) -> usize {
         }
     }
 
-    let len = lines.len();
+    // println!("columns=> {columns:?}  row=> {rows:?}");
 
     for line in lines.iter_mut() {
         {
             for y in 0..line.len() {
-                for (id, c) in rows.iter().enumerate() {
+                for c in &rows {
                     if y == *c {
-                        let el = c + id;
-                        line.insert(el, ".".to_string());
+                        line[y] = "x".to_string();
                     }
                 }
             }
         }
     }
 
-    for x in 0..len {
+    for x in 0..lines.len() {
         let len = lines[x].len();
-        for (id, c) in columns.iter().enumerate() {
-            let mut arr = vec![];
-            arr.resize(len, ".".to_string());
+        for c in &columns {
             if x == *c {
-                let el = c + id;
-                lines.insert(el, arr);
+                for i in 0..len {
+                    lines[x][i] = "x".to_string();
+                }
             }
         }
     }
+
+    // for line in &lines {
+    //     println!("line => {:?}", line);
+    // }
 
     let mut galaxy_location = HashMap::new();
 
@@ -105,6 +108,7 @@ fn process(input: &str) -> usize {
     }
 
     let pairs = generate_pairs(galaxy_count);
+    let rows = rows;
 
     pairs
         .iter()
@@ -114,9 +118,41 @@ fn process(input: &str) -> usize {
             let loc_x = galaxy_location.get(&x).expect("msg");
             let loc_y = galaxy_location.get(&y).expect("msg");
 
+            let mut for_x_axis = 0;
+            let mut for_x = [loc_x.0, loc_y.0];
+            let mut for_y = [loc_x.1, loc_y.1];
+            for_x.sort();
+            for_y.sort();
+
+            let growth = 1000000 - 1;
+
+            for x in for_x[0]..for_x[1] {
+                let x = x as usize;
+                for y in &columns {
+                    if y == &x {
+                        for_x_axis += growth;
+                    }
+                }
+            }
+
+            let mut for_y_axis = 0;
+            for x in for_y[0]..for_y[1] {
+                let x = x as usize;
+                for y in &rows {
+                    if y == &x {
+                        for_y_axis += growth;
+                    }
+                }
+            }
+
+            let count = for_y_axis + for_x_axis;
+            // println!("for_y_axis ={for_y_axis}  for_x_axis {for_x_axis}");
+            // }
+
             let x_axis = loc_x.0.abs_diff(loc_y.0);
             let y_axis = loc_x.1.abs_diff(loc_y.1);
-            x_axis + y_axis
+
+            x_axis + y_axis + count
         })
         .sum::<usize>()
 }
