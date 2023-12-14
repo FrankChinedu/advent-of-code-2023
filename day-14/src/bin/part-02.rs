@@ -13,17 +13,11 @@ enum Direction {
 
 impl Direction {
     fn tilt_by_dir(&self, lines: &mut [Vec<char>], rock_locations: &Vec<(usize, usize)>) {
-        // match self {
-        //     Direction::North => (-1, 0),
-        //     Direction::West => (0, -1),
-        //     Direction::South => (1, 0),
-        //     Direction::East => (0, 1),
-        // }
         match self {
             Direction::North => self.tilt_north(lines, rock_locations),
             Direction::West => self.tilt_west(lines, rock_locations),
             Direction::South => self.tilt_south(lines, rock_locations),
-            _ => panic!(" should not reach"),
+            Direction::East => self.tilt_east(lines, rock_locations),
         }
     }
 
@@ -110,16 +104,32 @@ impl Direction {
         }
         println!(" ");
     }
+
+    fn tilt_east(&self, lines: &mut [Vec<char>], rock_locations: &Vec<(usize, usize)>) {
+        for pos in rock_locations {
+            // right
+            let len = lines[0].len();
+            let x: usize = pos.0;
+            for y in 0..len - 1 {
+                let right_index = y + 1;
+                let tmp_char = lines[x][right_index];
+                let current_char = lines[x][y];
+                if tmp_char == '.' && current_char == 'O' {
+                    lines[x][y] = tmp_char;
+                    lines[x][right_index] = current_char;
+                }
+            }
+        }
+    }
 }
 
 fn process(input: &str) -> usize {
-    let _directions = [
+    let directions = [
         Direction::North,
         Direction::West,
         Direction::South,
         Direction::East,
     ];
-    let directions = [Direction::North, Direction::West, Direction::South];
     let lines: Vec<Vec<char>> = input.lines().map(|x| x.chars().collect()).collect();
 
     for x in &lines {
@@ -134,7 +144,7 @@ fn process(input: &str) -> usize {
     for dir in directions {
         sum = dir.run(&mut lines);
 
-        // if Direction::West == dir {
+        // if Direction::South == dir {
         for x in &lines {
             println!("{x:?}")
         }
