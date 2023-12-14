@@ -65,7 +65,7 @@ impl Direction {
                 let tmp_char = lines[up_index][y];
                 let current_char = lines[x][y];
                 if tmp_char == '.' && current_char == 'O' {
-                    lines[up_index][y] = lines[x][y];
+                    lines[up_index][y] = current_char;
                     lines[x][y] = tmp_char;
                 }
             }
@@ -74,17 +74,19 @@ impl Direction {
 
     fn tilt_west(&self, lines: &mut [Vec<char>], rock_locations: &Vec<(usize, usize)>) {
         for pos in rock_locations {
-            let y = pos.1;
-            for x in (1..=pos.0).rev() {
-                let up_index = x - 1;
-                let tmp_char = lines[up_index][y];
+            // left
+            let x = pos.0;
+            for y in (1..=pos.1).rev() {
+                let left_index = y - 1;
+                let tmp_char = lines[x][left_index];
                 let current_char = lines[x][y];
                 if tmp_char == '.' && current_char == 'O' {
-                    lines[up_index][y] = lines[x][y];
                     lines[x][y] = tmp_char;
+                    lines[x][left_index] = current_char;
                 }
             }
         }
+        println!(" ");
     }
 }
 
@@ -97,6 +99,12 @@ fn process(input: &str) -> usize {
     ];
     let directions = [Direction::North, Direction::West];
     let lines: Vec<Vec<char>> = input.lines().map(|x| x.chars().collect()).collect();
+
+    for x in &lines {
+        println!("{x:?}")
+    }
+
+    println!(" ");
 
     let mut lines = lines;
     let mut sum = 0;
