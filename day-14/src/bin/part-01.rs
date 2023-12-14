@@ -1,7 +1,7 @@
 fn main() {
-    let input = include_str!("./test.txt");
-    process(input);
-    // println!("ans {}", );
+    let input = include_str!("./test1.txt");
+    // process(input);
+    println!("ans {}", process(input));
 }
 
 // fn generate_pairs2(n: usize, k: usize) -> Vec<(usize, usize)> {
@@ -20,19 +20,22 @@ fn call(x: usize, y: usize, lines: &mut Vec<Vec<char>>) {
         let up_index = x - 1;
         let up_char = &lines[up_index][y];
         let char = &lines[x][y];
+        // print!("y {y} char{char}");
         if char == &'#' || up_char == &'#' || char == &'.' {
-            let num = x - 1;
-            return call(num, y, lines);
+            return;
+            // let num = x - 1;
+            // return _call(num, y, lines);
         }
         {
             let tmp_char = lines[up_index][y];
             lines[up_index][y] = lines[x][y];
             lines[x][y] = tmp_char;
 
-            let num = x - 1;
-            call(num, y, lines)
+            // let num = x - 1;
+            // call(num, y, lines)
         }
     }
+    // println!(" ");
 }
 
 fn process(input: &str) -> usize {
@@ -40,30 +43,50 @@ fn process(input: &str) -> usize {
     let len = lines.len();
     let line_len = lines[0].len();
 
+    println!(" line_len {line_len} len {len}");
+    println!(" ");
+
     let mut lines = lines;
-    for x in (0..len).rev() {
+    for x in (1..len).rev() {
+        println!(" ");
+        println!(" x ={x}");
         for y in 0..line_len {
+            print!("{y} ");
             let up_index = x as isize - 1;
+            print!("y {y}  ===>> ");
             if x != 0 || up_index.is_positive() {
-                call(x, y, &mut lines)
+                for j in (0..=x).rev() {
+                    call(j, y, &mut lines);
+                    // print!("{j} ");
+                }
+                // call(x, y, &mut lines)
             }
+            // println!(" ");
+            println!(" ")
         }
     }
     // println!("  ");
-    // for x in &lines {
-    //     println!("{x:?}")
-    // }
-    // println!(" after ");
-    lines
-        .iter_mut()
-        .rev()
-        .enumerate()
-        .map(|(index, char)| {
-            let num = index + 1;
-            let count = char.iter().filter(|y| **y == 'O').count();
-            num * count
-        })
-        .sum::<usize>()
+    let lines: Vec<String> = lines.iter().map(|x| x.iter().collect()).collect();
+
+    // println!(" ");
+
+    for x in &lines {
+        println!("{x:?}");
+        // println!(" ");
+    }
+
+    println!("  ");
+    // lines
+    //     .iter_mut()
+    //     .rev()
+    //     .enumerate()
+    //     .map(|(index, char)| {
+    //         let num = index + 1;
+    //         let count = char.iter().filter(|y| **y == 'O').count();
+    //         num * count
+    //     })
+    //     .sum::<usize>()
+    0
 }
 
 #[cfg(test)]
