@@ -1,92 +1,47 @@
 fn main() {
-    let input = include_str!("./test1.txt");
-    // process(input);
+    let input = include_str!("./input.txt");
     println!("ans {}", process(input));
-}
-
-// fn generate_pairs2(n: usize, k: usize) -> Vec<(usize, usize)> {
-//     let mut pairs = Vec::new();
-
-//     for i in 1..=n {
-//         for j in (i + 1)..=std::cmp::min(i + k - 1, n) {
-//             pairs.push((i, j));
-//         }
-//     }
-
-//     pairs
-// }
-fn call(x: usize, y: usize, lines: &mut Vec<Vec<char>>) {
-    if x != 0 {
-        let up_index = x - 1;
-        let up_char = &lines[up_index][y];
-        let char = &lines[x][y];
-        // print!("y {y} char{char}");
-        if char == &'#' || up_char == &'#' || char == &'.' {
-            return;
-            // let num = x - 1;
-            // return _call(num, y, lines);
-        }
-        {
-            let tmp_char = lines[up_index][y];
-            lines[up_index][y] = lines[x][y];
-            lines[x][y] = tmp_char;
-
-            // let num = x - 1;
-            // call(num, y, lines)
-        }
-    }
-    // println!(" ");
 }
 
 fn process(input: &str) -> usize {
     let lines: Vec<Vec<char>> = input.lines().map(|x| x.chars().collect()).collect();
-    let len = lines.len();
-    let line_len = lines[0].len();
 
-    println!(" line_len {line_len} len {len}");
-    println!(" ");
+    let mut rock_locations = vec![];
 
-    let mut lines = lines;
-    for x in (1..len).rev() {
-        println!(" ");
-        println!(" x ={x}");
-        for y in 0..line_len {
-            print!("{y} ");
-            let up_index = x as isize - 1;
-            print!("y {y}  ===>> ");
-            if x != 0 || up_index.is_positive() {
-                for j in (0..=x).rev() {
-                    call(j, y, &mut lines);
-                    // print!("{j} ");
+    for (x, line) in lines.iter().enumerate() {
+        if x != 0 {
+            for (y, val) in line.iter().enumerate() {
+                if val == &'O' {
+                    let pos = (x, y);
+                    rock_locations.push(pos);
                 }
-                // call(x, y, &mut lines)
             }
-            // println!(" ");
-            println!(" ")
         }
     }
-    // println!("  ");
-    let lines: Vec<String> = lines.iter().map(|x| x.iter().collect()).collect();
 
-    // println!(" ");
-
-    for x in &lines {
-        println!("{x:?}");
-        // println!(" ");
+    let mut lines = lines;
+    for pos in &rock_locations {
+        let y = pos.1;
+        for x in (1..=pos.0).rev() {
+            let up_index = x - 1;
+            let tmp_char = lines[up_index][y];
+            let current_char = lines[x][y];
+            if tmp_char == '.' && current_char == 'O' {
+                lines[up_index][y] = lines[x][y];
+                lines[x][y] = tmp_char;
+            }
+        }
     }
-
-    println!("  ");
-    // lines
-    //     .iter_mut()
-    //     .rev()
-    //     .enumerate()
-    //     .map(|(index, char)| {
-    //         let num = index + 1;
-    //         let count = char.iter().filter(|y| **y == 'O').count();
-    //         num * count
-    //     })
-    //     .sum::<usize>()
-    0
+    lines
+        .iter_mut()
+        .rev()
+        .enumerate()
+        .map(|(index, char)| {
+            let num = index + 1;
+            let count = char.iter().filter(|y| **y == 'O').count();
+            num * count
+        })
+        .sum::<usize>()
 }
 
 #[cfg(test)]
