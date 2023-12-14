@@ -3,6 +3,7 @@ fn main() {
     println!("ans {}", process(input));
 }
 
+#[derive(Debug, PartialEq, Eq)]
 enum Direction {
     North,
     West,
@@ -21,6 +22,7 @@ impl Direction {
         match self {
             Direction::North => self.tilt_north(lines, rock_locations),
             Direction::West => self.tilt_west(lines, rock_locations),
+            Direction::South => self.tilt_south(lines, rock_locations),
             _ => panic!(" should not reach"),
         }
     }
@@ -72,6 +74,26 @@ impl Direction {
         }
     }
 
+    fn tilt_south(&self, lines: &mut [Vec<char>], rock_locations: &[(usize, usize)]) {
+        let mut rock_locations = rock_locations.to_vec();
+        rock_locations.reverse();
+
+        let len = lines[0].len() - 1;
+        for pos in rock_locations {
+            // down
+            let y = pos.1;
+            for x in 0..len {
+                let down_index = x + 1;
+                let tmp_char = lines[down_index][y];
+                let current_char = lines[x][y];
+                if current_char == 'O' && tmp_char == '.' {
+                    lines[down_index][y] = current_char;
+                    lines[x][y] = tmp_char;
+                }
+            }
+        }
+    }
+
     fn tilt_west(&self, lines: &mut [Vec<char>], rock_locations: &Vec<(usize, usize)>) {
         for pos in rock_locations {
             // left
@@ -97,7 +119,7 @@ fn process(input: &str) -> usize {
         Direction::South,
         Direction::East,
     ];
-    let directions = [Direction::North, Direction::West];
+    let directions = [Direction::North, Direction::West, Direction::South];
     let lines: Vec<Vec<char>> = input.lines().map(|x| x.chars().collect()).collect();
 
     for x in &lines {
@@ -111,9 +133,12 @@ fn process(input: &str) -> usize {
 
     for dir in directions {
         sum = dir.run(&mut lines);
+
+        // if Direction::West == dir {
         for x in &lines {
             println!("{x:?}")
         }
+        // }
 
         println!(" ");
     }
