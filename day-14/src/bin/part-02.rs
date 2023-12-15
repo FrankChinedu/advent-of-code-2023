@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("./test.txt");
+    let input = include_str!("./input.txt");
     println!("ans {}", process(input));
 }
 
@@ -102,7 +102,6 @@ impl Direction {
                 }
             }
         }
-        println!(" ");
     }
 
     fn tilt_east(&self, lines: &mut [Vec<char>], rock_locations: &Vec<(usize, usize)>) {
@@ -132,26 +131,31 @@ fn process(input: &str) -> usize {
     ];
     let lines: Vec<Vec<char>> = input.lines().map(|x| x.chars().collect()).collect();
 
-    for x in &lines {
-        println!("{x:?}")
-    }
-
-    println!(" ");
-
     let mut lines = lines;
     let mut sum = 0;
 
-    for dir in directions {
-        sum = dir.run(&mut lines);
+    let mut cycle_count = 1000000000;
+    let count = cycle_count;
 
-        // if Direction::South == dir {
-        for x in &lines {
-            println!("{x:?}")
+    loop {
+        cycle_count -= 1;
+        for dir in &directions {
+            sum = dir.run(&mut lines);
         }
-        // }
-
-        println!(" ");
+        if cycle_count == 0 {
+            break;
+        }
     }
+
+    println!("cycle count={count}");
+
+    let lines: Vec<String> = lines.iter().map(|x| x.iter().collect()).collect();
+
+    for x in &lines {
+        println!("{x}")
+    }
+
+    println!(" ");
 
     sum
 }
