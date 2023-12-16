@@ -1,5 +1,5 @@
 fn main() {
-    let input = include_str!("./test.txt");
+    let input = include_str!("./input.txt");
     println!("ans {}", process(input));
 }
 
@@ -60,14 +60,8 @@ fn process(input: &str) -> usize {
         })
         .collect::<Vec<_>>();
 
-    // for x in &lenses {
-    //     println!("{x:?}");
-    // }
-
-    println!(" ");
-
-    let capacity = 4;
-    // let capacity = 256;
+    // let capacity = 4;
+    let capacity = 256;
     let mut boxes: Vec<Option<Vec<Lens<'_>>>> = Vec::with_capacity(capacity);
 
     for _ in 0..capacity {
