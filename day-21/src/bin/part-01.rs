@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 fn main() {
-    let input = include_str!("./test.txt");
+    let input = include_str!("./input.txt");
     println!("{}", process(input));
 }
 
@@ -57,7 +57,7 @@ fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>])
             }
         }
 
-        if dir == Down && !(pos.x + 1) >= x_length {
+        if dir == Down && (pos.x + 1) < x_length {
             let x = pos.x + 1;
             let pos = Pos { x, y: pos.y };
             let char = lines[pos.x][pos.y];
@@ -75,7 +75,7 @@ fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>])
             }
         }
 
-        if dir == Right && !(pos.y + 1) >= y_lenght {
+        if dir == Right && (pos.y + 1) < y_lenght {
             let y = pos.y + 1;
             let pos = Pos { x: pos.x, y };
             let char = lines[pos.x][pos.y];
@@ -116,8 +116,57 @@ fn process(input: &str) -> usize {
         }
     }
 
-    println!("{starting_pos:?}");
-    0
+    let starting_plot = garden_map.get(&starting_pos).expect("has starting pos");
+
+    let num_of_steps = 64;
+
+    let mut steps = num_of_steps - 1;
+
+    let mut garden_plots = vec![];
+    garden_plots.extend(starting_plot.neihbors.clone());
+
+    // let mut cloned_lines = lines.clone();
+
+    loop {
+        // let mut inner_cloned_lines = lines.clone();
+        let garden_plots_reached = garden_plots.len();
+        if steps == 0 {
+            break;
+        }
+
+        for _plot in 0..garden_plots_reached {
+            let plot = garden_plots.remove(0);
+            let garden_plot = garden_map.get(&plot).expect("has plot");
+            // println!(" ");
+            let neihbors = &garden_plot.neihbors;
+
+            // for pos in neihbors {
+            //     inner_cloned_lines[pos.x][pos.y] = 'O';
+            // }
+            garden_plots.extend(neihbors.clone());
+        }
+
+        // cloned_lines = inner_cloned_lines;
+
+        steps -= 1;
+    }
+
+    let set: HashSet<Pos> = garden_plots.into_iter().collect();
+    let garden_plots: Vec<Pos> = set.into_iter().collect();
+
+    // for x in &garden_plots {
+    //     println!("-> {x:?}");
+    // }
+
+    // println!(" ");
+    // println!("num_of_steps {num_of_steps}");
+    // println!(" ");
+
+    // for line in &cloned_lines {
+    //     println!(" {line:?}");
+    // }
+
+    garden_plots.len()
 }
 
 #[cfg(test)]
