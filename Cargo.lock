@@ -140,7 +140,7 @@ version = "0.1.0"
 name = "day-03"
 version = "0.1.0"
 dependencies = [
- "glam",
+ "glam 0.24.2",
  "itertools",
  "miette",
  "nom",
@@ -170,7 +170,7 @@ name = "day-07"
 version = "0.1.0"
 dependencies = [
  "assert_matches",
- "glam",
+ "glam 0.24.2",
  "itertools",
  "miette",
  "nom",
@@ -195,7 +195,7 @@ version = "0.1.0"
 name = "day-10"
 version = "0.1.0"
 dependencies = [
- "glam",
+ "glam 0.24.2",
  "itertools",
  "miette",
  "nom",
@@ -213,7 +213,7 @@ name = "day-12"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "glam",
+ "glam 0.24.2",
  "itertools",
  "miette",
  "nom",
@@ -290,6 +290,15 @@ dependencies = [
 [[package]]
 name = "day-22"
 version = "0.1.0"
+dependencies = [
+ "glam 0.25.0",
+ "itertools",
+ "miette",
+ "nom",
+ "nom_locate",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "either"
@@ -308,6 +317,12 @@ name = "glam"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b5418c17512bdf42730f9032c74e1ae39afc408745ebb2acf72fbc4691c17945"
+
+[[package]]
+name = "glam"
+version = "0.25.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "151665d9be52f9bb40fc7966565d39666f2d1e69233571b71b87791c7e0528b3"
 
 [[package]]
 name = "indicatif"
