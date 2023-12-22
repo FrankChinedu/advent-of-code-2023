@@ -122,21 +122,23 @@ fn process(input: &str) -> usize {
 
     let mut steps = num_of_steps - 1;
 
-    let mut garden_plots = vec![];
+    let mut garden_plots = HashSet::new();
     garden_plots.extend(starting_plot.neihbors.clone());
 
     // let mut cloned_lines = lines.clone();
 
     loop {
         // let mut inner_cloned_lines = lines.clone();
-        let garden_plots_reached = garden_plots.len();
+        // let arr = garden_plots.iter().copied().collect();
+        let arr = garden_plots.clone();
+        let arr = arr.iter().collect::<Vec<_>>();
         if steps == 0 {
             break;
         }
 
-        for _plot in 0..garden_plots_reached {
-            let plot = garden_plots.remove(0);
-            let garden_plot = garden_map.get(&plot).expect("has plot");
+        for plot in arr {
+            let garden_plot = garden_map.get(plot).expect("has plot");
+            garden_plots.remove(plot);
             // println!(" ");
             let neihbors = &garden_plot.neihbors;
 
@@ -151,8 +153,8 @@ fn process(input: &str) -> usize {
         steps -= 1;
     }
 
-    let set: HashSet<Pos> = garden_plots.into_iter().collect();
-    let garden_plots: Vec<Pos> = set.into_iter().collect();
+    // let set: HashSet<Pos> = garden_plots.into_iter().collect();
+    // let garden_plots: Vec<Pos> = set.into_iter().collect();
 
     // for x in &garden_plots {
     //     println!("-> {x:?}");
