@@ -1,27 +1,34 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 fn main() {
-    let input = include_str!("./test.txt");
+    let input = include_str!("./input.txt");
     println!("{}", process(input));
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Default, Hash, PartialEq, Eq)]
+#[derive(Debug, Default, Hash, PartialEq, Eq, Clone)]
 struct Pos {
     x: usize,
     y: usize,
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Tile {
     // pos: Pos,
     tile_type: Type,
-    neighbor: Vec<Pos>,
+    neighbor: Vec<Neighbor>,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone)]
+struct Neighbor {
+    dir: Direction,
+    pos: Pos,
 }
 
 impl Tile {
-    fn new(tile_type: Type, neighbor: Vec<Pos>) -> Self {
+    fn new(tile_type: Type, neighbor: Vec<Neighbor>) -> Self {
         Self {
             // pos,
             tile_type,
@@ -31,13 +38,13 @@ impl Tile {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Type {
     Path,
     Slope(Direction),
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 enum Direction {
     Up,
     Down,
@@ -45,7 +52,7 @@ enum Direction {
     Right,
 }
 
-fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>]) -> Vec<Pos> {
+fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>]) -> Vec<Neighbor> {
     use Direction::*;
     let mut vec = vec![];
 
@@ -57,7 +64,7 @@ fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>])
             let pos = Pos { x, y: pos.y };
             let char = lines[pos.x][pos.y];
             if char != '#' {
-                vec.push(pos)
+                vec.push(Neighbor { dir: Up, pos })
             }
         }
 
@@ -66,7 +73,7 @@ fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>])
             let pos = Pos { x, y: pos.y };
             let char = lines[pos.x][pos.y];
             if char != '#' {
-                vec.push(pos)
+                vec.push(Neighbor { dir: Down, pos })
             }
         }
 
@@ -75,7 +82,7 @@ fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>])
             let pos = Pos { x: pos.x, y };
             let char = lines[pos.x][pos.y];
             if char != '#' {
-                vec.push(pos)
+                vec.push(Neighbor { dir: Left, pos })
             }
         }
 
@@ -84,7 +91,7 @@ fn get_neigbor(pos: &Pos, x_length: usize, y_lenght: usize, lines: &[Vec<char>])
             let pos = Pos { x: pos.x, y };
             let char = lines[pos.x][pos.y];
             if char != '#' {
-                vec.push(pos)
+                vec.push(Neighbor { dir: Right, pos })
             }
         }
     }
@@ -101,6 +108,10 @@ fn process(input: &str) -> usize {
         ..Default::default()
     };
 
+    let mut ending_pos = Pos {
+        ..Default::default()
+    };
+
     let mut map_hash = HashMap::new();
     let x_length = lines.len();
 
@@ -109,6 +120,10 @@ fn process(input: &str) -> usize {
         for (y, char) in line.iter().enumerate() {
             if x == 0 && char == &'.' {
                 starting_pos = Pos { x, y };
+            }
+
+            if x == x_length - 1 && char == &'.' {
+                ending_pos = Pos { x, y };
             }
 
             let tile_type_option = match char {
@@ -129,16 +144,116 @@ fn process(input: &str) -> usize {
         }
     }
 
-    for x in map_hash {
-        if x.0.x == 0 {
-            println!("{x:?}");
+    // println!("ending_pos {ending_pos:?}");
+    // println!("starting_pos {starting_pos:?}");
+
+    // for x in &map_hash {
+    //     if x.0.x == 0 {
+    //         println!("{x:?}");
+    //     }
+    // }
+    // println!(" ");
+    let mut count = 0u32;
+
+    let mut clone_lines = lines.clone();
+    let mut path_history = HashSet::new();
+
+    // 'outer: loop {
+    let mut history = HashSet::new();
+    let mut history_state = vec![];
+    let mut current_pos = starting_pos.clone();
+
+    'travel: loop {
+        if current_pos == ending_pos {
+            break 'travel;
+        }
+        let current_pos_copy = current_pos.clone();
+        if !history.contains(&current_pos) {
+            history.insert(current_pos.clone());
+            let char = &lines[current_pos.x][current_pos.y];
+            let to_go = match char {
+                '>' => Some(&Direction::Right),
+                '<' => Some(&Direction::Left),
+                'v' => Some(&Direction::Down),
+                '^' => Some(&Direction::Up),
+                _ => None,
+            };
+            let current_tile = map_hash.get(&current_pos).expect("has current tile");
+            let directions = &current_tile.neighbor;
+            if directions.len() > 2 {
+                let his_state = HistoryState {
+                    pos: current_pos.clone(),
+                    count,
+                    tile: current_tile.clone(),
+                };
+                history_state.push(his_state);
+                let maps = directions
+                    .iter()
+                    .filter(|neighbor| !history.contains(&neighbor.pos))
+                    .map(|x| x.pos.clone())
+                    .collect::<Vec<_>>();
+
+                path_history.extend(maps.clone());
+
+                // break;
+                // if history_state.len() > 1 {
+                //     break;
+                // }
+            }
+
+            for dir in directions {
+                let char = clone_lines[dir.pos.x][dir.pos.y];
+                if char == '.' {
+                    clone_lines[dir.pos.x][dir.pos.y] = 'O';
+                }
+
+                let cur_pos = &dir.pos;
+                if history.contains(cur_pos) {
+                    continue;
+                }
+
+                if let Some(val) = to_go {
+                    if val != &dir.dir {
+                        continue;
+                    }
+                }
+
+                count += 1;
+                current_pos = cur_pos.clone();
+            }
+            if current_pos_copy == current_pos && !history_state.is_empty() {
+                // break 'travel;
+                let len: usize = history_state.len();
+                let state = &history_state[len - 1];
+                count = state.count;
+                for state_neighbor in &state.tile.neighbor {
+                    if !history.contains(&state_neighbor.pos) {
+                        current_pos = state_neighbor.pos.clone();
+                        break;
+                    }
+                }
+            }
         }
     }
-    println!(" ");
+    // path_history.retain(|x| history.contains(x));
+    // if path_history.is_empty() {
+    //     break 'outer;
+    // }
+    // }
 
-    println!("starting pos {:?}", starting_pos);
-    // println!("input: {input}");
+    // for x in path_history {
+    //     println!("{x:?}");
+    // }
+    println!("count: {count}");
     0
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+struct HistoryState {
+    pos: Pos,
+    count: u32,
+    tile: Tile,
 }
 
 #[cfg(test)]
