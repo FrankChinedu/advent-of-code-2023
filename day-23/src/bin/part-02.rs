@@ -156,7 +156,7 @@ fn process(input: &str) -> usize {
     let mut count = 0u32;
 
     let mut clone_lines = lines.clone();
-    let mut path_history = HashSet::new();
+    // let mut path_history = HashSet::new();
 
     // 'outer: loop {
     let mut history = HashSet::new();
@@ -170,14 +170,14 @@ fn process(input: &str) -> usize {
         let current_pos_copy = current_pos.clone();
         if !history.contains(&current_pos) {
             history.insert(current_pos.clone());
-            let char = &lines[current_pos.x][current_pos.y];
-            let to_go = match char {
-                '>' => Some(&Direction::Right),
-                '<' => Some(&Direction::Left),
-                'v' => Some(&Direction::Down),
-                '^' => Some(&Direction::Up),
-                _ => None,
-            };
+            // let char = &lines[current_pos.x][current_pos.y];
+            // let to_go = match char {
+            //     '>' => Some(&Direction::Right),
+            //     '<' => Some(&Direction::Left),
+            //     'v' => Some(&Direction::Down),
+            //     '^' => Some(&Direction::Up),
+            //     _ => None,
+            // };
             let current_tile = map_hash.get(&current_pos).expect("has current tile");
             let directions = &current_tile.neighbor;
             if directions.len() > 2 {
@@ -187,13 +187,13 @@ fn process(input: &str) -> usize {
                     tile: current_tile.clone(),
                 };
                 history_state.push(his_state);
-                let maps = directions
-                    .iter()
-                    .filter(|neighbor| !history.contains(&neighbor.pos))
-                    .map(|x| x.pos.clone())
-                    .collect::<Vec<_>>();
+                // let maps = directions
+                //     .iter()
+                //     .filter(|neighbor| !history.contains(&neighbor.pos))
+                //     .map(|x| x.pos.clone())
+                //     .collect::<Vec<_>>();
 
-                path_history.extend(maps.clone());
+                // path_history.extend(maps.clone());
 
                 // break;
                 // if history_state.len() > 1 {
@@ -212,11 +212,11 @@ fn process(input: &str) -> usize {
                     continue;
                 }
 
-                if let Some(val) = to_go {
-                    if val != &dir.dir {
-                        continue;
-                    }
-                }
+                // if let Some(val) = to_go {
+                //     if val != &dir.dir {
+                //         continue;
+                //     }
+                // }
 
                 count += 1;
                 current_pos = cur_pos.clone();
@@ -241,7 +241,7 @@ fn process(input: &str) -> usize {
     // }
     // }
 
-    // for x in path_history {
+    // for x in &clone_lines {
     //     println!("{x:?}");
     // }
     println!("count: {count}");
